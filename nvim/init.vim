@@ -30,7 +30,10 @@ let g:coc_global_extensions=[
             \'coc-python',
             \'coc-tabnine',
             \'coc-emoji',
-            \'coc-floaterm'
+            \'coc-floaterm',
+            \'coc-markdownlint',
+            \'coc-webview',
+            \'coc-markdown-preview-enhanced'
             \]
 
 " code syntax
@@ -80,8 +83,8 @@ Plug 'leshill/vim-json', {'for':'json'}
 "kotlin
 Plug 'udalov/kotlin-vim'
 " markdown
-Plug 'godlygeek/tabular'
-Plug 'plasticboy/vim-markdown'
+"Plug 'godlygeek/tabular'
+"Plug 'plasticboy/vim-markdown'
 " nerdtree plugins
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 let NERDTreeShowHidden=1
@@ -334,6 +337,7 @@ map <C-Right> :bp<CR>        "上一个缓冲区
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 noremap <F12> :Format<CR>
 autocmd filetype vim noremap <buffer> <F12> :Autoformat<CR>
+autocmd filetype markdown noremap <buffer> <F12> :Format<CR>:CocCommand markdownlint.fixAll<CR>
 autocmd filetype vue,typescriptreact,javascriptreact nnoremap <buffer> <F12> :Prettier<CR>
 let g:shfmt_opt="-ci"
 autocmd filetype cs,c,cpp,kotlin,sh,zsh,tex noremap <buffer> <F12> :Neoformat<CR>
