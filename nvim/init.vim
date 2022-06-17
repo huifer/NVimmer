@@ -6,6 +6,7 @@ Plug 'mhinz/vim-startify'
 Plug 'neoclide/coc.nvim', {'branch':'release'}
 let g:coc_global_extensions=[
             \'coc-html',
+            \'coc-solidity',
             \'coc-eslint',
             \'coc-tsserver',
             \'coc-snippets',
@@ -13,21 +14,20 @@ let g:coc_global_extensions=[
             \'coc-kotlin',
             \'coc-clangd',
             \'coc-java',
+            \'coc-yaml',
+            \'coc-wxml',
+            \'coc-vetur',
+            \'coc-python',
+            \'coc-stylelint',
             \'coc-pairs',
             \'coc-json',
-            \'coc-vimtex',
-            \'coc-texlab',
             \'coc-lists',
             \'coc-highlight',
             \'coc-css',
             \'coc-git',
             \'coc-phpls',
             \'coc-prettier',
-            \'coc-wxml',
-            \'coc-vetur',
-            \'coc-stylelint',
             \'coc-word',
-            \'coc-python',
             \'coc-tabnine',
             \'coc-emoji',
             \'coc-floaterm',
@@ -39,17 +39,16 @@ let g:coc_global_extensions=[
 " code syntax
 Plug 'thesis/vim-solidity'
 Plug 'pangloss/vim-javascript'
-Plug 'posva/vim-vue'
+Plug 'posva/vim-vue',{'for':'vue'}
 Plug 'uiiaoo/java-syntax.vim', {'for':'java'}
-Plug 'othree/html5.vim', {'for':['html','vue','php']}
-Plug 'hail2u/vim-css3-syntax',{'for':['html','vue','php','css']}
-" 颜色显示
-Plug 'ap/vim-css-color',{'for':['html','vue','php','css']}
+"Plug 'othree/html5.vim', {'for':['html','vue','php']}
+Plug 'ap/vim-css-color'
+"Plug 'hail2u/vim-css3-syntax',{'for':['html','vue','php','css']}
+Plug 'stephpy/vim-yaml',{'for':'yaml'}
+Plug 'tpope/vim-haml',{'for':['haml','sass','scss']}
 " themes
 Plug 'flazz/vim-colorschemes'
 Plug 'jacoborus/tender.vim'
-Plug 'lervag/vimtex', {'for': 'tex'}
-Plug 'xuhdev/vim-latex-live-preview', {'for': 'tex'}
 Plug 'majutsushi/tagbar', {'on':'TagbarToggle'}
 "let g:tagbar_ctags_bin='/opt/homebrew/Cellar/ctags/5.8_2/bin/ctags'
 Plug 'vim-airline/vim-airline'
@@ -81,7 +80,7 @@ Plug 'jackguo380/vim-lsp-cxx-highlight'
 " json
 Plug 'leshill/vim-json', {'for':'json'}
 "kotlin
-Plug 'udalov/kotlin-vim'
+Plug 'udalov/kotlin-vim',{'for':'kotlin'}
 " markdown
 "Plug 'godlygeek/tabular'
 "Plug 'plasticboy/vim-markdown'
@@ -97,14 +96,12 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists('s:std_in') |
             \ execute 'NERDTree' argv()[0] | wincmd p | enew | execute 'cd '.argv()[0] | endif
-
-let g:vue_pre_processors = []
+" px to rem
+Plug 'Oldenborg/vim-px-to-rem'
+let g:px_to_rem_base = 50 "use flexble.js default 1rem = 50px
 call plug#end()
 
 "------------------------------coc.nvim---------------------------------------
-" Set internal encoding of vim, not needed on neovim, since coc.nvim using some
-" unicode characters in the file autoload/float.vim
-set encoding=utf-8
 
 " TextEdit might fail if hidden is not set.
 set hidden
@@ -333,14 +330,14 @@ map <C-H> :bn<CR>            "下一个缓冲区
 map <C-L> :bp<CR>        "上一个缓冲区
 map <C-Left> :bn<CR>            "下一个缓冲区
 map <C-Right> :bp<CR>        "上一个缓冲区
-"代码格式化---------------------------------------------------------------------------------------
+"Format Code---------------------------------------------------------------------------------------
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
-noremap <F12> :Format<CR>
+map <F12> :Format<CR>
 autocmd filetype vim noremap <buffer> <F12> :Autoformat<CR>
-autocmd filetype markdown noremap <buffer> <F12> :Format<CR>:CocCommand markdownlint.fixAll<CR>
-autocmd filetype vue,typescriptreact,javascriptreact nnoremap <buffer> <F12> :Prettier<CR>
+autocmd filetype markdown noremap <buffer> <F12> :CocCommand markdownlint.fixAll<CR>
+autocmd filetype vue,tex,typescriptreact,javascriptreact noremap <buffer> <F12> :Prettier<CR>
 let g:shfmt_opt="-ci"
-autocmd filetype cs,c,cpp,kotlin,sh,zsh,tex noremap <buffer> <F12> :Neoformat<CR>
+autocmd filetype cs,c,cpp,kotlin,sh,zsh noremap <buffer> <F12> :Neoformat<CR>
 "常用快捷键---------------------------------------------------------------------------------------
 "去空行，去行尾空格
 nnoremap <F2> :g/^\s*$/d<CR>:g/\s\+$/s<CR>
@@ -354,6 +351,8 @@ let g:floaterm_keymap_toggle = '<F4>'
 nmap <F9> :TagbarToggle<CR>
 "按F5保存
 nmap <F5> :w<CR>
+"markdown preview
+autocmd filetype markdown nmap <F6> :CocCommand markdown-preview-enhanced.openPreview<CR>
 
 "实用配置------------------------------------------------------------------------------
 " 只剩 NERDTree时自动关闭

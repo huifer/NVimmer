@@ -6,7 +6,6 @@
 
     "prettier.trailingComma": "none",
     "prettier.printWidth": 120,
-    "prettier.jsxBracketSameLine": true,
     "prettier.tabWidth": 4,
     "prettier.semi": false,
     "prettier.jsxSingleQuote": false,
@@ -42,7 +41,6 @@
     "vetur.format.defaultFormatter.less": "prettier",
     "vetur.format.defaultFormatter.scss": "prettier",
     "vetur.format.defaultFormatter.ts": "prettier",
-    "vetur.format.defaultFormatter.stylus": "stylus-supremacy",
     "vetur.format.defaultFormatter.postcss": "prettier",
 
     "json.format.enable": false,
@@ -63,8 +61,8 @@
 
     "java.errors.incompleteClasspath.severity": "ignore",
 
-    "tsserver.enableJavascript": false,
     "markdownlint.config": {
         "line-length": false
-    }
+    },
+    "markdown-preview-enhanced.previewTheme": "github-light.css"
 }
