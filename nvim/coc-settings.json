@@ -56,8 +56,8 @@
 
     "eslint.alwaysShowStatus": true,
     "eslint.format.enable": true,
-    "eslint.autoFixOnSave": true,
-    "eslint.run": "onSave",
+    "eslint.autoFixOnSave": false,
+    "eslint.run": "onType",
 
     "java.errors.incompleteClasspath.severity": "ignore",
 
