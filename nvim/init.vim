@@ -24,7 +24,6 @@ let g:coc_global_extensions=[
             \'coc-lists',
             \'coc-highlight',
             \'coc-css',
-            \'coc-git',
             \'coc-phpls',
             \'coc-prettier',
             \'coc-word',
@@ -102,43 +101,33 @@ let g:px_to_rem_base = 50 "use flexble.js default 1rem = 50px
 call plug#end()
 
 "------------------------------coc.nvim---------------------------------------
-
-" TextEdit might fail if hidden is not set.
-set hidden
-
 " Some servers have issues with backup files, see #649.
 set nobackup
 set nowritebackup
-
-" Give more space for displaying messages.
-set cmdheight=2
 
 " Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
 " delays and poor user experience.
 set updatetime=300
 
-" Don't pass messages to |ins-completion-menu|.
-set shortmess+=c
-
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
-if has("nvim-0.5.0") || has("patch-8.1.1564")
-    " Recently vim can merge signcolumn and number column into one
-    set signcolumn=number
-else
-    set signcolumn=yes
-endif
+set signcolumn=yes
 
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-            \ pumvisible() ? "\<C-n>" :
-            \ <SID>check_back_space() ? "\<TAB>" :
+            \ coc#pum#visible() ? coc#pum#next(1):
+            \ <SID>CheckBackspace() ? "\<Tab>" :
             \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
-function! s:check_back_space() abort
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice.
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+            \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
@@ -149,11 +138,6 @@ if has('nvim')
 else
     inoremap <silent><expr> <c-@> coc#refresh()
 endif
-
-" Make <CR> auto-select the first completion item and notify coc.nvim to
-" format on enter, <cr> could be remapped by other vim plugin
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-            \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
@@ -167,15 +151,13 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> K :call ShowDocumentation()<CR>
 
-function! s:show_documentation()
-    if (index(['vim','help'], &filetype) >= 0)
-        execute 'h '.expand('<cword>')
-    elseif (coc#rpc#ready())
+function! ShowDocumentation()
+    if CocAction('hasProvider', 'hover')
         call CocActionAsync('doHover')
     else
-        execute '!' . &keywordprg . " " . expand('<cword>')
+        call feedkeys('K', 'in')
     endif
 endfunction
 
@@ -335,7 +317,7 @@ command! -nargs=0 Prettier :CocCommand prettier.formatFile
 map <F12> :Format<CR>
 autocmd filetype vim noremap <buffer> <F12> :Autoformat<CR>
 autocmd filetype markdown noremap <buffer> <F12> :CocCommand markdownlint.fixAll<CR>
-autocmd filetype vue,tex,typescriptreact,javascriptreact noremap <buffer> <F12> :Prettier<CR>
+"autocmd filetype vue,typescriptreact,javascriptreact noremap <buffer> <F12> :Prettier<CR>
 let g:shfmt_opt="-ci"
 autocmd filetype cs,c,cpp,kotlin,sh,zsh noremap <buffer> <F12> :Neoformat<CR>
 "常用快捷键---------------------------------------------------------------------------------------
@@ -344,13 +326,13 @@ nnoremap <F2> :g/^\s*$/d<CR>:g/\s\+$/s<CR>
 "html标签自动补全
 map! <C-O> <C-Y>,
 "列出当前目录文件
-nmap <F3> :NERDTreeToggle<CR>
+noremap <F3> :NERDTreeToggle<CR>
 "nmap <F4> :CocCommand floaterm.toggle<CR>
 let g:floaterm_keymap_toggle = '<F4>'
 "tagbar
-nmap <F9> :TagbarToggle<CR>
+noremap <F9> :TagbarToggle<CR>
 "按F5保存
-nmap <F5> :w<CR>
+noremap <F5> :w<CR>
 "markdown preview
 autocmd filetype markdown nmap <F6> :CocCommand markdown-preview-enhanced.openPreview<CR>
 
@@ -428,28 +410,34 @@ let g:fzf_commands_expect = 'alt-enter,ctrl-x'
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
+let g:fzf_action = { 'ctrl-b': 'edit' }
+" Advanced customization using Vim function
+inoremap <expr> <c-x><c-w> fzf#vim#complete#word({'right': '20%'})
+"fzf-----------------------------------------------------------------------
 
-" Insert mode completion
-imap <c-x><c-w> <plug>(fzf-complete-word)
-imap <c-x><c-p> <plug>(fzf-complete-path)
-imap <c-x><c-f> <plug>(fzf-complete-file-ag)
-imap <c-x><c-l> <plug>(fzf-complete-line)
-nmap <C-F> :Files<CR>
-nmap <C-P> :Files<CR>
+
+" map usual keys, command control------------------------------------------
+imap <C-x><C-w> <plug>(fzf-complete-word)
+imap <C-x><C-p> <plug>(fzf-complete-path)
+imap <C-x><C-f> <plug>(fzf-complete-file-ag)
+imap <C-x><C-l> <plug>(fzf-complete-line)
+nmap <C-f> :Files<CR>
 nmap ff :Files<CR>
-vmap <C-c> "+y
-imap <C-V> <Esc>"+gpa
-nmap <C-V> "+gp
-imap <C-P> <Esc>:Files<CR>
+" copy
+vnoremap <C-c> "+y
+vmap <D-c> "+y
+" parse
+inoremap <C-v> <Esc>"+gpa
+nnoremap <C-v> "+gp
+"save
+nnoremap <D-s> :w
+
 nmap <C-B> :Buffers<CR>
 nmap fb :Buffers<CR>
 imap <C-B> <Esc>:Buffers<CR>
 nmap <C-T> :Tags<CR>
 nmap ft :Tags<CR>
-let g:fzf_action = { 'ctrl-b': 'edit' }
-
-" Advanced customization using Vim function
-inoremap <expr> <c-x><c-w> fzf#vim#complete#word({'right': '20%'})
+" map usual keys, command control------------------------------------------
 
 "闪烁光标------------------------------------------------------------------
 set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
